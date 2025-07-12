@@ -140,5 +140,3 @@ class LangGraphAgent:
             print(f"Error in chat method: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Failed to generate response: {str(e)}")
 
-# Global LangGraphAgent instance
-agent = LangGraphAgent() 

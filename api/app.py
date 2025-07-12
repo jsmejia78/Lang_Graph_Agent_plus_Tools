@@ -9,7 +9,7 @@ from openai import OpenAI
 import os
 import sys
 from typing import Optional, Dict
-from langgraph_agent import agent
+from langgraph_agent import LangGraphAgent
 
 
 # Initialize FastAPI application with a title
@@ -38,7 +38,8 @@ class ChatRequest(BaseModel):
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-
+        
+        agent = LangGraphAgent()
         return await agent.chat(request.user_message, request.api_keys, request.system_message)
     
     except Exception as e:
