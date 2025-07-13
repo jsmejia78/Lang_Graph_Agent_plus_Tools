@@ -89,6 +89,11 @@ export default function App() {
   // Settings popup state
   const [showSettingsPopup, setShowSettingsPopup] = useState(false);
   
+  // Metadata popup states
+  const [showToolCallsPopup, setShowToolCallsPopup] = useState(false);
+  const [showMessagesPopup, setShowMessagesPopup] = useState(false);
+  const [selectedMessageData, setSelectedMessageData] = useState(null);
+  
   // Ref for auto-scrolling to latest message
   const chatEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -436,6 +441,183 @@ export default function App() {
           </div>
         )}
 
+        {/* Tool Calls Popup Modal */}
+        {showToolCallsPopup && selectedMessageData && (
+          <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "1rem"
+          }}>
+            <div style={{
+              background: "white",
+              borderRadius: "12px",
+              padding: window.innerWidth <= 768 ? "1.5rem" : "2rem",
+              width: "100%",
+              maxWidth: "700px",
+              maxHeight: "80vh",
+              overflow: "auto",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+            }}>
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1.5rem"
+              }}>
+                <h2 style={{ margin: 0, color: "#1f2937" }}>🔧 Tool Calls</h2>
+                <button
+                  onClick={() => setShowToolCallsPopup(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "1.5rem",
+                    cursor: "pointer",
+                    color: "#6b7280"
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {selectedMessageData.tool_calls && selectedMessageData.tool_calls.length > 0 ? (
+                  selectedMessageData.tool_calls.map((toolCall, index) => (
+                    <div key={index} style={{
+                      background: "#f8fafc",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      padding: "1rem"
+                    }}>
+                      <div style={{ fontWeight: "600", marginBottom: "0.5rem", color: "#1f2937" }}>
+                        Tool Call #{index + 1}
+                      </div>
+                      <div style={{ fontSize: "0.875rem", color: "#6b7280", marginBottom: "0.5rem" }}>
+                        <strong>ID:</strong> {toolCall.id || "N/A"}
+                      </div>
+                      <div style={{ fontSize: "0.875rem", color: "#6b7280", marginBottom: "0.5rem" }}>
+                        <strong>Name:</strong> {toolCall.name || "N/A"}
+                      </div>
+                      <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                        <strong>Arguments:</strong>
+                        <pre style={{
+                          background: "#f3f4f6",
+                          padding: "0.5rem",
+                          borderRadius: "4px",
+                          marginTop: "0.25rem",
+                          fontSize: "0.75rem",
+                          overflow: "auto",
+                          whiteSpace: "pre-wrap"
+                        }}>
+                          {JSON.stringify(toolCall.args || {}, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ textAlign: "center", color: "#6b7280", padding: "2rem" }}>
+                    No tool calls found
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Messages Popup Modal */}
+        {showMessagesPopup && selectedMessageData && (
+          <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "1rem"
+          }}>
+            <div style={{
+              background: "white",
+              borderRadius: "12px",
+              padding: window.innerWidth <= 768 ? "1.5rem" : "2rem",
+              width: "100%",
+              maxWidth: "700px",
+              maxHeight: "80vh",
+              overflow: "auto",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+            }}>
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1.5rem"
+              }}>
+                <h2 style={{ margin: 0, color: "#1f2937" }}>💬 Agent Messages</h2>
+                <button
+                  onClick={() => setShowMessagesPopup(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "1.5rem",
+                    cursor: "pointer",
+                    color: "#6b7280"
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {selectedMessageData.messages && selectedMessageData.messages.length > 0 ? (
+                  selectedMessageData.messages.map((message, index) => (
+                    <div key={index} style={{
+                      background: "#f8fafc",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      padding: "1rem"
+                    }}>
+                      <div style={{ fontWeight: "600", marginBottom: "0.5rem", color: "#1f2937" }}>
+                        Message #{index + 1}
+                      </div>
+                      <div style={{ fontSize: "0.875rem", color: "#6b7280", marginBottom: "0.5rem" }}>
+                        <strong>Type:</strong> {message.type || message.constructor?.name || "Unknown"}
+                      </div>
+                      <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                        <strong>Content:</strong>
+                        <div style={{
+                          background: "#f3f4f6",
+                          padding: "0.5rem",
+                          borderRadius: "4px",
+                          marginTop: "0.25rem",
+                          fontSize: "0.75rem",
+                          overflow: "auto",
+                          whiteSpace: "pre-wrap"
+                        }}>
+                          {message.content || "No content"}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ textAlign: "center", color: "#6b7280", padding: "2rem" }}>
+                    No messages found
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Chat Container */}
         <div style={{ 
           flex: 1, 
@@ -570,9 +752,33 @@ export default function App() {
                         gap: "1rem"
                       }}>
                         {msg.metadata.total_tool_calls > 0 && (
-                          <span>🔧 {msg.metadata.total_tool_calls} tool calls</span>
+                          <span 
+                            onClick={() => {
+                              setSelectedMessageData(msg);
+                              setShowToolCallsPopup(true);
+                            }}
+                            style={{
+                              cursor: "pointer",
+                              textDecoration: "underline",
+                              color: "#3b82f6"
+                            }}
+                          >
+                            🔧 {msg.metadata.total_tool_calls} tool calls
+                          </span>
                         )}
-                        <span>💬 {msg.metadata.total_messages} messages</span>
+                        <span 
+                          onClick={() => {
+                            setSelectedMessageData(msg);
+                            setShowMessagesPopup(true);
+                          }}
+                          style={{
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                            color: "#3b82f6"
+                          }}
+                        >
+                          💬 {msg.metadata.total_messages} messages
+                        </span>
                       </div>
                     )}
                   </div>
