@@ -251,7 +251,7 @@ export default function App() {
                 fontSize: "1.5rem", 
                 fontWeight: "600" 
               }}>
-                🤖 LangGraph Agent (+Tools)
+                🤖 LangGraph Stock Agent
               </h1>
               <div style={{ 
                 display: "flex", 
