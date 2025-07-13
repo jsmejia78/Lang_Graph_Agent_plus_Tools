@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.14",
-    "numpy>=2.3.1",
     "pydantic>=2.11.7",
     "python-dotenv==1.0.0",
     "python-multipart==0.0.18",
@@ -14,7 +13,6 @@ dependencies = [
     "langchain-community>=0.3.27",
     "langchain-openai>=0.3.27",
     "langgraph>=0.5.1",
-    "langsmith>=0.4.4",
     "tavily-python>=0.7.9",
     "yfinance>=0.2.43",
 ]
