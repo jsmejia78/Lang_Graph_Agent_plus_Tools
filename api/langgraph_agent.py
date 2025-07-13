@@ -55,6 +55,7 @@ class LangGraphAgent:
                 ArxivQueryRun(),
             ]
 
+
             self.model = ChatOpenAI(model="gpt-4.1-nano", temperature=0)
             self.model = self.model.bind_tools(self.tool_belt)
 
@@ -101,9 +102,9 @@ class LangGraphAgent:
             if self.agent_graph is not None:
                 async for chunk in self.agent_graph.astream(inputs, stream_mode="updates"):
                     for node, values in chunk.items():
-                        print(f"Receiving update from node: '{node}'")
-                        print(values["messages"])
-                        print("\n\n")
+                        #print(f"Receiving update from node: '{node}'")
+                        #print(values["messages"])
+                        #print("\n\n")
                         
                         # Store messages from nodes
                         if "messages" in values:
