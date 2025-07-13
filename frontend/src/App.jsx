@@ -1,21 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import 'katex/dist/katex.min.css';
-
-// Function to transform bracket-wrapped LaTeX expressions
-const transformBracketMath = (text) => {
-  if (!text) return text;
-  
-  // Transform [ ... ] to $ ... $ with precise spacing
-  return text.replace(/\[\s*([^\[\]]*?)\s*\]/g, (match, captured) => {
-    // Remove all leading and trailing spaces from the captured content
-    const cleanContent = captured.trim();
-    return `$${cleanContent}$`;
-  });
-};
 
 // Simple error boundary component
 class ErrorBoundary extends React.Component {

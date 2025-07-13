@@ -1,6 +1,6 @@
 import os
-from typing import List, Dict, Any
-from fastapi import UploadFile, HTTPException
+from typing import Dict
+from fastapi import HTTPException
 import asyncio
 from langchain_community.tools.tavily_search import TavilySearchResults
 import yfinance as yf
@@ -9,8 +9,7 @@ from langchain_core.tools import Tool
 from langchain_openai import ChatOpenAI
 from typing import TypedDict, Annotated
 from langgraph.graph.message import add_messages
-import operator
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.prebuilt import ToolNode
 from langgraph.graph import StateGraph, END
 from uuid import uuid4
