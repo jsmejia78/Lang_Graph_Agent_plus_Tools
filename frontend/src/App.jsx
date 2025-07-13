@@ -605,7 +605,7 @@ export default function App() {
                     borderRadius: "50%",
                     animation: "spin 1s linear infinite"
                   }}></div>
-                  AI is thinking...
+                  Agent thinking...
                 </div>
               </div>
             )}
