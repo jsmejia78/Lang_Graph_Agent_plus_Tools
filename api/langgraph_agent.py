@@ -3,6 +3,7 @@ from typing import Dict
 from fastapi import HTTPException
 import asyncio
 #from langchain_community.tools.tavily_search import TavilySearchResults
+from tavily import TavilyClient
 import yfinance as yf
 import json
 from langchain_core.tools import Tool
@@ -60,7 +61,6 @@ class LangGraphAgent:
                     news = ticker.news[:3] if ticker.news else []
                     
                     # Format the response
-                    # Format the response as JSON
                     result = {
                         "symbol": symbol,
                         "company_name": info.get("longName", "N/A"),
@@ -76,6 +76,18 @@ class LangGraphAgent:
                     return f"Error getting data for {symbol}: {str(e)}"
             
             #tavily_tool = TavilySearchResults(max_results=5)
+            tavily_client = TavilyClient(api_key = os.environ["TAVILY_API_KEY"])
+
+            def tavily_search(query: str, max_results: int = 3) -> str:
+                results = tavily_client.search(query=query, max_results=max_results)
+                summaries = "\n".join(f"{i+1}. {r['title']} - {r['url']}" for i, r in enumerate(results["results"]))
+                return summaries or "No results found."
+
+            tavily_tool = Tool.from_function(
+                func=tavily_search,
+                name="tavily_search",
+                description="Search the web for the latest news and information"
+            )
             
             stock_info_tool = Tool.from_function(
                 func=get_stock_info,
@@ -84,7 +96,7 @@ class LangGraphAgent:
             )
 
             self.tool_belt = [
-                #tavily_tool,
+                tavily_tool,
                 stock_info_tool
             ]
 
@@ -134,10 +146,7 @@ class LangGraphAgent:
             if self.agent_graph is not None:
                 async for chunk in self.agent_graph.astream(inputs, stream_mode="updates"):
                     for node, values in chunk.items():
-                        #print(f"Receiving update from node: '{node}'")
-                        #print(values["messages"])
-                        #print("\n\n")
-                        
+
                         # Store messages from nodes
                         if "messages" in values:
                             for message in values["messages"]:
