@@ -200,68 +200,102 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div style={{ 
+      <div className="chat-container" style={{ 
         fontFamily: "system-ui, sans-serif", 
-        height: "100vh", 
-        display: "flex", 
-        flexDirection: "column",
-        background: "#f8fafc"
+        minHeight: "100vh", 
+        background: "#f8fafc",
+        padding: "1rem",
+        display: "flex",
+        justifyContent: "center"
       }}>
-        {/* Header */}
-        <div style={{ 
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          color: "white",
-          padding: "1rem 2rem",
+        <div className="chat-card" style={{
+          width: "100%",
+          maxWidth: "800px",
+          background: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+          flexDirection: "column",
+          height: "calc(100vh - 2rem)",
+          overflow: "hidden"
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "600" }}>
-              🤖 LangGraph AI Assistant
-            </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.875rem", opacity: 0.9 }}>API Status:</span>
-              <span style={{ fontSize: "1rem" }}>{health || "🔶"}</span>
+          {/* Header */}
+          <div className="header-padding" style={{ 
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "white",
+            padding: "1rem 2rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderTopLeftRadius: "12px",
+            borderTopRightRadius: "12px",
+            flexWrap: "wrap",
+            gap: "1rem"
+          }}>
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "1rem",
+              flex: 1,
+              minWidth: "200px"
+            }}>
+              <h1 className="header-title" style={{ 
+                margin: 0, 
+                fontSize: "1.5rem", 
+                fontWeight: "600" 
+              }}>
+                🤖 LangGraph AI Assistant
+              </h1>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "0.5rem"
+              }}>
+                <span style={{ fontSize: "0.875rem", opacity: 0.9 }}>API Status:</span>
+                <span style={{ fontSize: "1rem" }}>{health || "🔶"}</span>
+              </div>
+            </div>
+            
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "1rem",
+              flexShrink: 0
+            }}>
+              <button
+                onClick={() => setShowSettingsPopup(true)}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "rgba(255,255,255,0.2)",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  borderRadius: "8px",
+                  color: "white",
+                  cursor: "pointer",
+                  fontSize: "0.875rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem"
+                }}
+              >
+                ⚙️ <span className="button-text">Settings</span>
+              </button>
+              
+              <button
+                onClick={clearConversation}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "rgba(255,255,255,0.2)",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  borderRadius: "8px",
+                  color: "white",
+                  cursor: "pointer",
+                  fontSize: "0.875rem"
+                }}
+              >
+                🗑️ <span className="button-text">Clear Chat</span>
+              </button>
             </div>
           </div>
-          
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <button
-              onClick={() => setShowSettingsPopup(true)}
-              style={{
-                padding: "0.5rem 1rem",
-                background: "rgba(255,255,255,0.2)",
-                border: "1px solid rgba(255,255,255,0.3)",
-                borderRadius: "8px",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "0.875rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem"
-              }}
-            >
-              ⚙️ Settings
-            </button>
-            
-            <button
-              onClick={clearConversation}
-              style={{
-                padding: "0.5rem 1rem",
-                background: "rgba(255,255,255,0.2)",
-                border: "1px solid rgba(255,255,255,0.3)",
-                borderRadius: "8px",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "0.875rem"
-              }}
-            >
-              🗑️ Clear Chat
-            </button>
-          </div>
-        </div>
 
         {/* Settings Popup Modal */}
         {showSettingsPopup && (
@@ -275,13 +309,14 @@ export default function App() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 1000
+            zIndex: 1000,
+            padding: "1rem"
           }}>
             <div style={{
               background: "white",
               borderRadius: "12px",
-              padding: "2rem",
-              width: "90%",
+              padding: window.innerWidth <= 768 ? "1.5rem" : "2rem",
+              width: "100%",
               maxWidth: "500px",
               maxHeight: "80vh",
               overflow: "auto",
@@ -411,6 +446,7 @@ export default function App() {
           {/* Chat Messages */}
           <div 
             ref={chatContainerRef}
+            className="chat-messages-padding"
             style={{ 
               flex: 1, 
               overflowY: "auto", 
@@ -442,6 +478,7 @@ export default function App() {
                   }}
                 >
                   <div
+                    className="message-bubble"
                     style={{
                       maxWidth: "70%",
                       padding: "1rem",
@@ -578,13 +615,14 @@ export default function App() {
 
           {/* Error message */}
           {error && (
-            <div style={{
+            <div className="error-margin error-padding" style={{
               background: "#fef2f2",
               border: "1px solid #fecaca",
               color: "#dc2626",
               padding: "1rem",
               margin: "0 2rem",
-              borderRadius: "8px"
+              borderRadius: "8px",
+              fontSize: "1rem"
             }}>
               ❌ {error}
             </div>
@@ -592,7 +630,7 @@ export default function App() {
 
           {/* API Keys warning */}
           {!hasAllApiKeys() && (
-            <div style={{
+            <div className="error-margin error-padding" style={{
               background: "#fef3c7",
               border: "1px solid #fde68a",
               color: "#d97706",
@@ -607,18 +645,25 @@ export default function App() {
         </div>
 
         {/* Input Form */}
-        <div style={{ 
+        <div className="input-form-padding" style={{ 
           background: "#ffffff",
           borderTop: "1px solid #e5e7eb",
-          padding: "1rem 2rem"
+          padding: "1rem 2rem",
+          borderBottomLeftRadius: "12px",
+          borderBottomRightRadius: "12px"
         }}>
-          <form onSubmit={handleSubmit} style={{ display: "flex", gap: "1rem" }}>
+          <form onSubmit={handleSubmit} className="input-form" style={{ 
+            display: "flex", 
+            gap: "1rem",
+            flexDirection: "row"
+          }}>
             <div style={{ flex: 1 }}>
               <textarea
                 value={userMessage}
                 onChange={(e) => setUserMessage(e.target.value)}
                 placeholder="Type your message..."
                 rows="3"
+                className="input-textarea"
                 style={{
                   width: "100%",
                   padding: "0.75rem",
@@ -626,7 +671,8 @@ export default function App() {
                   borderRadius: "8px",
                   fontSize: "0.875rem",
                   resize: "vertical",
-                  minHeight: "60px"
+                  minHeight: "60px",
+                  boxSizing: "border-box"
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -639,6 +685,7 @@ export default function App() {
             <button
               type="submit"
               disabled={loading || !userMessage.trim() || !hasAllApiKeys()}
+              className="send-button"
               style={{
                 padding: "0.75rem 1.5rem",
                 background: (loading || !userMessage.trim() || !hasAllApiKeys()) ? "#94a3b8" : "#3b82f6",
@@ -649,7 +696,8 @@ export default function App() {
                 fontSize: "0.875rem",
                 fontWeight: "500",
                 whiteSpace: "nowrap",
-                opacity: (loading || !userMessage.trim() || !hasAllApiKeys()) ? 0.5 : 1
+                opacity: (loading || !userMessage.trim() || !hasAllApiKeys()) ? 0.5 : 1,
+                minHeight: "auto"
               }}
             >
               {loading ? "Sending..." : "Send"}
@@ -657,15 +705,85 @@ export default function App() {
           </form>
         </div>
 
-        {/* Add CSS animation for loading spinner */}
+        {/* Add CSS animation for loading spinner and responsive styles */}
         <style>
           {`
             @keyframes spin {
               0% { transform: rotate(0deg); }
               100% { transform: rotate(360deg); }
             }
+            
+            /* Responsive styles */
+            @media (max-width: 768px) {
+              .chat-container {
+                height: calc(100vh - 1rem) !important;
+                margin: 0.5rem !important;
+              }
+              
+              .chat-card {
+                border-radius: 8px !important;
+              }
+              
+              .header-title {
+                font-size: 1.25rem !important;
+              }
+              
+              .header-padding {
+                padding: 1rem !important;
+              }
+              
+              .chat-messages-padding {
+                padding: 1rem !important;
+              }
+              
+              .message-bubble {
+                max-width: 85% !important;
+                padding: 0.75rem !important;
+              }
+              
+              .input-form-padding {
+                padding: 1rem !important;
+              }
+              
+              .input-form {
+                gap: 0.5rem !important;
+              }
+              
+              .input-textarea {
+                padding: 0.5rem !important;
+                min-height: 50px !important;
+              }
+              
+              .send-button {
+                padding: 0.5rem 1rem !important;
+              }
+              
+              .error-margin {
+                margin: 0 1rem !important;
+              }
+              
+              .error-padding {
+                padding: 0.75rem !important;
+                font-size: 0.875rem !important;
+              }
+              
+              .button-text {
+                display: none !important;
+              }
+            }
+            
+            @media (max-width: 480px) {
+              .input-form {
+                flex-direction: column !important;
+              }
+              
+              .send-button {
+                min-height: 40px !important;
+              }
+            }
           `}
         </style>
+        </div>
       </div>
     </ErrorBoundary>
   );
