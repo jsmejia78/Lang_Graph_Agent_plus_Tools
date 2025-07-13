@@ -6,6 +6,24 @@ from pydantic import BaseModel
 # Import OpenAI client for interacting with OpenAI's API
 from typing import Optional, Dict
 from langgraph_agent import LangGraphAgent
+import os
+import sys
+
+# Add the current directory to Python path for Vercel compatibility
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+# Import langgraph_agent with error handling for deployment
+try:
+    from langgraph_agent import LangGraphAgent
+except ImportError:
+    # Fallback for different import paths
+    try:
+        import langgraph_agent as langgraph_agent
+        LangGraphAgent = langgraph_agent.LangGraphAgent
+    except ImportError:
+        print("Warning: LangGraphAgent  could not be imported")
 
 
 # Initialize FastAPI application with a title
