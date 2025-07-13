@@ -244,7 +244,7 @@ export default function App() {
                 fontSize: "1.5rem", 
                 fontWeight: "600" 
               }}>
-                🤖 LangGraph AI Assistant
+                🤖 LangGraph Agent (+Tools)
               </h1>
               <div style={{ 
                 display: "flex", 
