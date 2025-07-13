@@ -61,17 +61,35 @@ class LangGraphAgent:
                     news = ticker.news[:3] if ticker.news else []
                     
                     # Format the response
-                    result = {
-                        "symbol": symbol,
-                        "company_name": info.get("longName", "N/A"),
-                        "current_price": info.get("currentPrice", "N/A"),
-                        "market_cap": info.get("marketCap", "N/A"),
-                        "pe_ratio": info.get("trailingPE", "N/A"),
-                        "52_week_high": info.get("fiftyTwoWeekHigh", "N/A"),
-                        "52_week_low": info.get("fiftyTwoWeekLow", "N/A"),
-                        "recent_news": [{"title": n.get("title", ""), "link": n.get("link", "")} for n in news]
-                    }
-                    return json.dumps(result, indent=2)
+                    # Format as natural text instead of JSON
+                    company_name = info.get("longName", "N/A")
+                    current_price = info.get("currentPrice", "N/A")
+                    market_cap = info.get("marketCap", "N/A")
+                    pe_ratio = info.get("trailingPE", "N/A")
+                    high_52 = info.get("fiftyTwoWeekHigh", "N/A")
+                    low_52 = info.get("fiftyTwoWeekLow", "N/A")
+                    
+                    # Format market cap
+                    if market_cap != "N/A" and isinstance(market_cap, (int, float)):
+                        if market_cap >= 1e12:
+                            market_cap_str = f"${market_cap/1e12:.1f}T"
+                        elif market_cap >= 1e9:
+                            market_cap_str = f"${market_cap/1e9:.1f}B"
+                        elif market_cap >= 1e6:
+                            market_cap_str = f"${market_cap/1e6:.1f}M"
+                        else:
+                            market_cap_str = f"${market_cap:,.0f}"
+                    else:
+                        market_cap_str = "N/A"
+                    
+                                        # Simple single-line format to avoid LLM processing issues
+                    result = f"Stock {symbol} ({company_name}): Price ${current_price}, Market Cap {market_cap_str}, PE Ratio {pe_ratio}, 52-Week Range ${low_52}-${high_52}"
+                    
+                    if news:
+                        news_titles = [n.get('title', 'No title') for n in news[:3]]
+                        result += f". Recent news: {'; '.join(news_titles)}"
+                    
+                    return result
                 except Exception as e:
                     return f"Error getting data for {symbol}: {str(e)}"
             

@@ -742,12 +742,11 @@ export default function App() {
                     <div style={{ lineHeight: "1.6" }}>
                       {msg.type === "assistant" ? (
                         <ReactMarkdown
-                          remarkPlugins={[remarkGfm, remarkMath]}
-                          rehypePlugins={[rehypeKatex]}
+                          remarkPlugins={[remarkGfm]}
                           components={{
                             p: ({ children }) => (
                               <p style={{ margin: "0.5rem 0", lineHeight: "1.6" }}>
-                                {typeof children === 'string' ? transformBracketMath(children) : children}
+                                {children}
                               </p>
                             ),
                             ul: ({ children }) => (
@@ -793,7 +792,9 @@ export default function App() {
                           {msg.content}
                         </ReactMarkdown>
                       ) : (
-                        msg.content
+                        <div style={{ whiteSpace: "pre-wrap" }}>
+                          {msg.content}
+                        </div>
                       )}
                     </div>
                     
