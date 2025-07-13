@@ -3,7 +3,9 @@ from typing import List, Dict, Any
 from fastapi import UploadFile, HTTPException
 import asyncio
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_community.tools.arxiv.tool import ArxivQueryRun
+import yfinance as yf
+import json
+from langchain_core.tools import Tool
 from langchain_openai import ChatOpenAI
 from typing import TypedDict, Annotated
 from langgraph.graph.message import add_messages
@@ -12,6 +14,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langgraph.prebuilt import ToolNode
 from langgraph.graph import StateGraph, END
 from uuid import uuid4
+
 
 class AgentState(TypedDict):
   messages: Annotated[list, add_messages]
@@ -48,13 +51,42 @@ class LangGraphAgent:
             os.environ["LANGCHAIN_TRACING_V2"] = "true"
             os.environ["LANGCHAIN_PROJECT"] = f"AIE7 - LangGraph - {uuid4().hex[0:8]}"
             
+            def get_stock_info(symbol: str) -> str:
+                """Get comprehensive stock information including price, news, and financials"""
+                try:
+                    ticker = yf.Ticker(symbol)
+                    info = ticker.info
+                    
+                    # Get recent news
+                    news = ticker.news[:3] if ticker.news else []
+                    
+                    # Format the response
+                    result = {
+                        "symbol": symbol,
+                        "company_name": info.get("longName", "N/A"),
+                        "current_price": info.get("currentPrice", "N/A"),
+                        "market_cap": info.get("marketCap", "N/A"),
+                        "pe_ratio": info.get("trailingPE", "N/A"),
+                        "52_week_high": info.get("fiftyTwoWeekHigh", "N/A"),
+                        "52_week_low": info.get("fiftyTwoWeekLow", "N/A"),
+                        "recent_news": [{"title": n.get("title", ""), "link": n.get("link", "")} for n in news]
+                    }
+                    return json.dumps(result, indent=2)
+                except Exception as e:
+                    return f"Error getting data for {symbol}: {str(e)}"
+            
             tavily_tool = TavilySearchResults(max_results=5)
+            
+            stock_info_tool = Tool.from_function(
+                func=get_stock_info,
+                name="yahoo_finance_stock_info",
+                description="Get detailed stock information including current price, market cap, PE ratio, 52-week range, and recent news for any stock symbol"
+            )
 
             self.tool_belt = [
                 tavily_tool,
-                ArxivQueryRun(),
+                stock_info_tool
             ]
-
 
             self.model = ChatOpenAI(model="gpt-4.1-nano", temperature=0)
             self.model = self.model.bind_tools(self.tool_belt)

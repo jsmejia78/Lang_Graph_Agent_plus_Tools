@@ -20,4 +20,5 @@ dependencies = [
     "langgraph>=0.5.1",
     "langsmith>=0.4.4",
     "tavily-python>=0.7.9",
+    "yfinance>=0.2.43",
 ]
