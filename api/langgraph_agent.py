@@ -3,7 +3,7 @@ from typing import Dict
 from fastapi import HTTPException
 import asyncio
 from langchain_community.tools.tavily_search import TavilySearchResults
-#import yfinance as yf
+import yfinance as yf
 import json
 from langchain_core.tools import Tool
 from langchain_openai import ChatOpenAI
@@ -50,7 +50,6 @@ class LangGraphAgent:
             os.environ["LANGCHAIN_TRACING_V2"] = "true"
             os.environ["LANGCHAIN_PROJECT"] = f"AIE7 - LangGraph - {uuid4().hex[0:8]}"
             
-            '''
             def get_stock_info(symbol: str) -> str:
                 """Get comprehensive stock information including price, news, and financials"""
                 try:
@@ -75,18 +74,18 @@ class LangGraphAgent:
                     return json.dumps(result, indent=2)
                 except Exception as e:
                     return f"Error getting data for {symbol}: {str(e)}"
-            '''
+            
             tavily_tool = TavilySearchResults(max_results=5)
             
-            #stock_info_tool = Tool.from_function(
-            #    func=get_stock_info,
-            #    name="yahoo_finance_stock_info",
-            #    description="Get detailed stock information including current price, market cap, PE ratio, 52-week range, and recent news for any stock symbol"
-            #)
+            stock_info_tool = Tool.from_function(
+                func=get_stock_info,
+                name="yahoo_finance_stock_info",
+                description="Get detailed stock information including current price, market cap, PE ratio, 52-week range, and recent news for any stock symbol"
+            )
 
             self.tool_belt = [
                 tavily_tool,
-                #stock_info_tool
+                stock_info_tool
             ]
 
             self.model = ChatOpenAI(model="gpt-4.1-nano", temperature=0)
