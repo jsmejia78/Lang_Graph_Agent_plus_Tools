@@ -67,11 +67,13 @@ class ErrorBoundary extends React.Component {
 
 export default function App() {
   // State for form fields
-  const [SystemMessage, setSystemMessage] = useState("");
   const [userMessage, setUserMessage] = useState("");
-  const [model, setModel] = useState("gpt-4.1-mini");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // Settings state
+  const [systemMessage, setSystemMessage] = useState("");
+  const [model, setModel] = useState("gpt-4.1-mini");
   
   // API Keys state
   const [apiKeys, setApiKeys] = useState({
@@ -156,7 +158,7 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          system_message: SystemMessage,
+          system_message: systemMessage,
           user_message: currentUserMessage,
           model,
           api_keys: apiKeys,
@@ -349,6 +351,59 @@ export default function App() {
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {/* System Prompt */}
+                <div>
+                  <label style={{ 
+                    display: "block", 
+                    marginBottom: "0.5rem", 
+                    fontWeight: "500",
+                    color: "#374151"
+                  }}>
+                    System Prompt:
+                  </label>
+                  <textarea
+                    placeholder="Enter system prompt (optional)..."
+                    value={systemMessage}
+                    onChange={e => setSystemMessage(e.target.value)}
+                    rows="4"
+                    style={{
+                      width: "100%",
+                      padding: "0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.875rem",
+                      resize: "vertical",
+                      fontFamily: "inherit"
+                    }}
+                  />
+                </div>
+
+                {/* Model Selection */}
+                <div>
+                  <label style={{ 
+                    display: "block", 
+                    marginBottom: "0.5rem", 
+                    fontWeight: "500",
+                    color: "#374151"
+                  }}>
+                    Model:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="gpt-4.1-mini"
+                    value={model}
+                    onChange={e => setModel(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "0.75rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      fontSize: "0.875rem",
+                      fontFamily: "monospace"
+                    }}
+                  />
+                </div>
+
                 {/* OpenAI API Key */}
                 <div>
                   <label style={{ 
@@ -580,34 +635,34 @@ export default function App() {
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {selectedMessageData.messages && selectedMessageData.messages.length > 0 ? (
                   selectedMessageData.messages.map((message, index) => (
-                    <div key={index} style={{
-                      background: "#f8fafc",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      padding: "1rem"
-                    }}>
-                      <div style={{ fontWeight: "600", marginBottom: "0.5rem", color: "#1f2937" }}>
-                        Message #{index + 1}
-                      </div>
-                      <div style={{ fontSize: "0.875rem", color: "#6b7280", marginBottom: "0.5rem" }}>
-                        <strong>Type:</strong> {message.type || message.constructor?.name || "Unknown"}
-                      </div>
-                      <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
-                        <strong>Content:</strong>
-                        <div style={{
-                          background: "#f3f4f6",
-                          padding: "0.5rem",
-                          borderRadius: "4px",
-                          marginTop: "0.25rem",
-                          fontSize: "0.75rem",
-                          overflow: "auto",
-                          whiteSpace: "pre-wrap"
-                        }}>
-                          {message.content || "No content"}
+                      <div key={index} style={{
+                        background: "#f8fafc",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                        padding: "1rem"
+                      }}>
+                        <div style={{ fontWeight: "600", marginBottom: "0.5rem", color: "#1f2937" }}>
+                          Message #{index + 1}
+                        </div>
+                        
+                        <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                          <strong>Raw Message:</strong>
+                          <pre style={{
+                            background: "#f3f4f6",
+                            padding: "0.5rem",
+                            borderRadius: "4px",
+                            marginTop: "0.25rem",
+                            fontSize: "0.75rem",
+                            overflow: "auto",
+                            whiteSpace: "pre-wrap",
+                            border: "1px solid #e5e7eb",
+                            maxHeight: "300px"
+                          }}>
+                            {JSON.stringify(message, null, 2)}
+                          </pre>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    ))
                 ) : (
                   <div style={{ textAlign: "center", color: "#6b7280", padding: "2rem" }}>
                     No messages found
