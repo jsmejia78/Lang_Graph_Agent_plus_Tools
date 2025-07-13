@@ -2,7 +2,7 @@ import os
 from typing import Dict
 from fastapi import HTTPException
 import asyncio
-from langchain_community.tools.tavily_search import TavilySearchResults
+#from langchain_community.tools.tavily_search import TavilySearchResults
 import yfinance as yf
 import json
 from langchain_core.tools import Tool
@@ -75,7 +75,7 @@ class LangGraphAgent:
                 except Exception as e:
                     return f"Error getting data for {symbol}: {str(e)}"
             
-            tavily_tool = TavilySearchResults(max_results=5)
+            #tavily_tool = TavilySearchResults(max_results=5)
             
             stock_info_tool = Tool.from_function(
                 func=get_stock_info,
@@ -84,7 +84,7 @@ class LangGraphAgent:
             )
 
             self.tool_belt = [
-                tavily_tool,
+                #tavily_tool,
                 stock_info_tool
             ]
 
