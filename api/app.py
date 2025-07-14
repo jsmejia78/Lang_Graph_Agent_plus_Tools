@@ -43,7 +43,7 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     system_message: str  # Message from the developer/system
     user_message: str      # Message from the user
-    model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
+    model: Optional[str] = "gpt-4o-mini"  # Optional model selection with default
     api_keys: Dict[str, str]          # API keys for authentication
     temperature: Optional[float] = 0.7  # Temperature for controlling creativity (0-2)
 
@@ -53,7 +53,11 @@ async def chat(request: ChatRequest):
     try:
         
         agent = LangGraphAgent()
-        return await agent.chat(request.user_message, request.api_keys, request.system_message)
+        return await agent.chat(user_message=request.user_message, 
+                                api_keys=request.api_keys, 
+                                system_message=request.system_message, 
+                                model_name=request.model or "gpt-4o-mini", 
+                                temperature=request.temperature or 0.7)
     
     except Exception as e:
         # Handle any errors that occur during processing

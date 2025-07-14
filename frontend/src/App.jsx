@@ -57,8 +57,8 @@ export default function App() {
   const [error, setError] = useState("");
   
   // Settings state
-  const [systemMessage, setSystemMessage] = useState("");
-  const [model, setModel] = useState("gpt-4.1-mini");
+  const [systemMessage, setSystemMessage] = useState("You are a helpful financial professional with deep and meaningful knowledge about the economy and the stock market in general. You have 3 tools at your disposal to perform your assigned tasks: Tavily, Wikipedia and Yahoo Finance.");
+  const [model, setModel] = useState("gpt-4o-mini");
   
   // API Keys state
   const [apiKeys, setApiKeys] = useState({
@@ -236,7 +236,7 @@ export default function App() {
                 fontSize: "1.5rem", 
                 fontWeight: "600" 
               }}>
-                🤖 LangGraph Stock Agent
+                🤖 LangGraph Financial Agent
               </h1>
               <div style={{ 
                 display: "flex", 
@@ -375,7 +375,7 @@ export default function App() {
                   </label>
                   <input
                     type="text"
-                    placeholder="gpt-4.1-mini"
+                    placeholder="gpt-4o-mini"
                     value={model}
                     onChange={e => setModel(e.target.value)}
                     style={{

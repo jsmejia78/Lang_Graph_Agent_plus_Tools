@@ -14,7 +14,10 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.prebuilt import ToolNode
 from langgraph.graph import StateGraph, END
 from uuid import uuid4
+import wikipedia
 
+# Optional: set language
+wikipedia.set_lang("en")
 
 class AgentState(TypedDict):
   messages: Annotated[list, add_messages]
@@ -41,7 +44,7 @@ class LangGraphAgent:
             return "action"
         return END
 
-    async def _initialization(self, api_keys: Dict[str, str]):
+    async def _initialization(self, api_keys: Dict[str, str], model_name: str, temperature: float):
         """Initialize everything needed for the agent"""
         try:
             # Set the API key as environment variable for the models\Agent
@@ -50,7 +53,8 @@ class LangGraphAgent:
             os.environ["LANGCHAIN_API_KEY"] = api_keys['LANGCHAIN_API_KEY']
             os.environ["LANGCHAIN_TRACING_V2"] = "true"
             os.environ["LANGCHAIN_PROJECT"] = f"AIE7 - LangGraph - {uuid4().hex[0:8]}"
-            
+
+            # Yahoo Finance tool
             def get_stock_info(symbol: str) -> str:
                 """Get comprehensive stock information including price, news, and financials"""
                 try:
@@ -75,6 +79,12 @@ class LangGraphAgent:
                 except Exception as e:
                     return f"Error getting data for {symbol}: {str(e)}"
             
+            stock_info_tool = Tool.from_function(
+                func=get_stock_info,
+                name="yahoo_finance_stock_info",
+                description="Get detailed stock information including current price, market cap, PE ratio, 52-week range, and recent news for any stock symbol"
+            )
+
             #tavily_tool = TavilySearchResults(max_results=5)
             tavily_client = TavilyClient(api_key = os.environ["TAVILY_API_KEY"])
 
@@ -88,19 +98,37 @@ class LangGraphAgent:
                 name="tavily_search",
                 description="Search the web for the latest news and information"
             )
-            
-            stock_info_tool = Tool.from_function(
-                func=get_stock_info,
-                name="yahoo_finance_stock_info",
-                description="Get detailed stock information including current price, market cap, PE ratio, 52-week range, and recent news for any stock symbol"
+
+            # Wikipedia tool
+            def wikipedia_lookup(query: str) -> str:
+                """
+                Searches Wikipedia for the query and returns a summary.
+                """
+                try:
+                    summary = wikipedia.summary(query, sentences=5)
+                    return f"Wikipedia summary for '{query}':\n{summary}"
+                except wikipedia.DisambiguationError as e:
+                    options = ", ".join(e.options[:5])
+                    return f"The term '{query}' is ambiguous. Did you mean: {options}?"
+                except wikipedia.PageError:
+                    return f"No Wikipedia page found for '{query}'."
+                except Exception as e:
+                    return f"Error searching Wikipedia: {str(e)}"
+
+            wikipedia_tool = Tool.from_function(
+                func=wikipedia_lookup,
+                name="wikipedia_lookup",
+                description="Search Wikipedia for the queried information."
             )
 
+            # Tool belt
             self.tool_belt = [
                 tavily_tool,
-                stock_info_tool
+                stock_info_tool,
+                wikipedia_tool
             ]
 
-            self.model = ChatOpenAI(model="gpt-4.1-nano", temperature=0)
+            self.model = ChatOpenAI(model=model_name, temperature=temperature)
             self.model = self.model.bind_tools(self.tool_belt)
 
             self.tool_node = ToolNode(self.tool_belt)
@@ -124,11 +152,11 @@ class LangGraphAgent:
             raise HTTPException(status_code=500, detail=f"Failed to initialize models: {str(e)}")
     
     
-    async def chat(self, user_message: str, api_keys: Dict[str, str], system_message: str = ""):
+    async def chat(self, user_message: str, api_keys: Dict[str, str], system_message: str = "", model_name: str = "gpt-4o-mini", temperature: float = 0):
         """ chat with the agent """
         try:
             if not self.agent_graph:
-                await self._initialization(api_keys)
+                await self._initialization(api_keys, model_name, temperature)
             
             # Prepare input messages, including system message if provided
             messages = []
@@ -170,7 +198,7 @@ class LangGraphAgent:
                 "messages": all_messages,
                 "tool_calls": tool_calls,
                 "metadata": {
-                    "model": "gpt-4.1-nano",
+                    "model": "gpt-4o-mini",
                     "total_messages": len(all_messages),
                     "total_tool_calls": len(tool_calls),
                     "system_message_used": bool(system_message)
